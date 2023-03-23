@@ -1,5 +1,7 @@
 #data
-Part_4/data/
+Part_1/data/
+Part_2/data/
+Part_3/data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
