@@ -3,6 +3,9 @@ Part_1/data/
 Part_2/data/
 Part_3/data/
 
+#other
+Part_2/wtf.ipynb
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
