@@ -6,16 +6,6 @@
 import pandas as pd
 import numpy as np
 from statsmodels.tsa.seasonal import seasonal_decompose
-from statsmodels.tsa.arima.model import ARIMA
-from statsmodels.tsa.forecasting.stl import STLForecast
-from statsmodels.tsa.forecasting.theta import ThetaModel
-
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from pandas.plotting import register_matplotlib_converters
-register_matplotlib_converters()
-sns.set_style('darkgrid')
 
 
 
@@ -176,12 +166,11 @@ def f_seasonal_decomp_sku(input_sku, frequency, plot):
         df_items_sold_monthly = ser_items_sold_monthly.reset_index()
         df_items_sold_monthly.set_index('datum_uhrzeit',inplace=True)
         df_items_sold_monthly.index=pd.to_datetime(df_items_sold_monthly.index, format= '%d.%m.%Y %H:%M:%S %Z')
-        df_items_sold_monthly['menge'] += 1
         df_items_sold_monthly
 
         #ser_items_sold_monthly.plot()
 
-        result=seasonal_decompose(df_items_sold_monthly['menge'], model='multiplicative', period=12)
+        result=seasonal_decompose(df_items_sold_monthly['menge'], model='additive', period=12)
         if plot == "residual":
             result.residual.plot()
         elif plot == 'seasonal':
@@ -196,12 +185,11 @@ def f_seasonal_decomp_sku(input_sku, frequency, plot):
         df_items_sold_weekly = ser_items_sold_weekly.reset_index()
         df_items_sold_weekly.set_index('datum_uhrzeit',inplace=True)
         df_items_sold_weekly.index=pd.to_datetime(df_items_sold_weekly.index, format= '%d.%m.%Y %H:%M:%S %Z')
-        df_items_sold_weekly['menge'] += 1
         df_items_sold_weekly 
 
         #ser_items_sold_weekly.plot()
 
-        result=seasonal_decompose(df_items_sold_weekly['menge'], model='multiplicative', period=52)
+        result=seasonal_decompose(df_items_sold_weekly['menge'], model='additive', period=52)
         if plot == "residual":
             result.residual.plot()
         elif plot == 'seasonal':
@@ -216,7 +204,7 @@ def f_seasonal_decomp_product(input_product, frequency, plot):
 
     from statsmodels.tsa.seasonal import seasonal_decompose
 
-    product_df = df_2017_23[['datum_uhrzeit', 'stock_keeping_unit', 'produkt', 'menge']][df_2017_23['produkt'].str.contains(input_product)] #contains
+    product_df = df_2017_23[['datum_uhrzeit', 'stock_keeping_unit', 'produkt', 'menge']][df_2017_23.produkt == input_product]
 
     if frequency == 'monthly':
 
@@ -224,12 +212,11 @@ def f_seasonal_decomp_product(input_product, frequency, plot):
         df_items_sold_monthly = ser_items_sold_monthly.reset_index()
         df_items_sold_monthly.set_index('datum_uhrzeit',inplace=True)
         df_items_sold_monthly.index=pd.to_datetime(df_items_sold_monthly.index, format= '%d.%m.%Y %H:%M:%S %Z')
-        df_items_sold_monthly['menge'] += 1
         df_items_sold_monthly
 
         #ser_items_sold_monthly.plot()
 
-        result=seasonal_decompose(df_items_sold_monthly['menge'], model='multiplicative', period=12)
+        result=seasonal_decompose(df_items_sold_monthly['menge'], model='additive', period=12)
         if plot == "residual":
             result.residual.plot()
         elif plot == 'seasonal':
@@ -244,12 +231,11 @@ def f_seasonal_decomp_product(input_product, frequency, plot):
         df_items_sold_weekly = ser_items_sold_weekly.reset_index()
         df_items_sold_weekly.set_index('datum_uhrzeit',inplace=True)
         df_items_sold_weekly.index=pd.to_datetime(df_items_sold_weekly.index, format= '%d.%m.%Y %H:%M:%S %Z')
-        df_items_sold_weekly['menge'] += 1
         df_items_sold_weekly 
 
         #ser_items_sold_weekly.plot()
 
-        result=seasonal_decompose(df_items_sold_weekly['menge'], model='multiplicative', period=52)
+        result=seasonal_decompose(df_items_sold_weekly['menge'], model='additive', period=52)
         if plot == "residual":
             result.residual.plot()
         elif plot == 'seasonal':
@@ -257,40 +243,11 @@ def f_seasonal_decomp_product(input_product, frequency, plot):
         elif plot == 'trend':
             result.trend.plot()
         else:
-            result.plot() 
+            result.plot()  
+
 
 
 #################################################################################################################
 #   FORECASTING
 #################################################################################################################
-
-
-def f_forecast_product(input_product):
-    product_df = df_2017_23[['datum_uhrzeit', 'stock_keeping_unit', 'produkt', 'menge']][df_2017_23['produkt'].str.contains(input_product)]
-    product_df['datum_uhrzeit']= pd.to_datetime(product_df['datum_uhrzeit'], format= '%d.%m.%Y %H:%M:%S %Z')
-
-    ser_items_sold_monthly = product_df.groupby([pd.Grouper(key='datum_uhrzeit', freq='M')])['menge'].sum()
-    df_items_sold_monthly = ser_items_sold_monthly.reset_index()
-    df_items_sold_monthly.set_index('datum_uhrzeit',inplace=True)
-    df_items_sold_monthly.index=pd.to_datetime(df_items_sold_monthly.index, format= '%d.%m.%Y %H:%M:%S %Z')
-
-    df_items_sold_monthly
-
-    model = ThetaModel(df_items_sold_monthly['menge'], deseasonalize = True, period = 12, method = 'multiplicative')
-
-    model_fit = model.fit()
-
-    forecast_values = model_fit.forecast(steps=24)
-
-    df_items_sold_monthly = df_items_sold_monthly.reset_index(inplace=False)
-    forecast_values = forecast_values.reset_index()
-    forecast_values.set_index('index',inplace=True)
-    forecast_values.insert(0, 'datum_uhrzeit', pd.date_range(start=df_items_sold_monthly['datum_uhrzeit'].max(), periods=24, freq='M'))
-
-    plt.figure(figsize=(12,6))
-    plt.plot(df_items_sold_monthly['datum_uhrzeit'], df_items_sold_monthly['menge'], label='actual sales')
-    plt.plot(forecast_values['datum_uhrzeit'], forecast_values['forecast'], label='forecasted sales')
-    plt.legend(loc='upper left')
-    plt.show()
-
 
