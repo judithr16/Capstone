@@ -154,6 +154,7 @@ df_2017_23.insert(5, 'produkt', df_2017_23['stock_keeping_unit'].map(sku_dict), 
 #################################################################################################################
 
 
+
 def f_seasonal_decomp_sku(input_sku, frequency, plot):
 
     from statsmodels.tsa.seasonal import seasonal_decompose
@@ -251,3 +252,15 @@ def f_seasonal_decomp_product(input_product, frequency, plot):
 #   FORECASTING
 #################################################################################################################
 
+
+
+
+
+
+#################################################################################################################
+#   COMPLETE
+#################################################################################################################
+
+
+def f_seasonal_decomp_sku(input_sku, frequency, plot, forecast):
+    

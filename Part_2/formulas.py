@@ -273,7 +273,7 @@ def f_forecast_product(input_product):
     df_items_sold_monthly = ser_items_sold_monthly.reset_index()
     df_items_sold_monthly.set_index('datum_uhrzeit',inplace=True)
     df_items_sold_monthly.index=pd.to_datetime(df_items_sold_monthly.index, format= '%d.%m.%Y %H:%M:%S %Z')
-
+    df_items_sold_monthly['menge'] += 1
     df_items_sold_monthly
 
     model = ThetaModel(df_items_sold_monthly['menge'], deseasonalize = True, period = 12, method = 'multiplicative')
@@ -292,5 +292,3 @@ def f_forecast_product(input_product):
     plt.plot(forecast_values['datum_uhrzeit'], forecast_values['forecast'], label='forecasted sales')
     plt.legend(loc='upper left')
     plt.show()
-
-
